@@ -131,6 +131,9 @@ KBUILD_TARGET   := Image.gz
 else
 KBUILD_TARGET   := Image
 endif
+ifeq ($(CONFIG_BUILD_ARM64_APPENDED_DTB_IMAGE),y)
+KBUILD_TARGET   := $(KBUILD_TARGET)-dtb
+endif
 
 # Default target when executing plain make
 boot		:= arch/arm64/boot
@@ -146,6 +149,9 @@ Image.%: Image
 
 zinstall install:
 	$(Q)$(MAKE) $(build)=$(boot) $@
+
+Image.gz-dtb: vmlinux scripts dtbs
+	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
 
 PHONY += vdso_install
 vdso_install:
