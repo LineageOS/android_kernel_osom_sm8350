@@ -5,6 +5,7 @@ LLVM=1
 CLANG_PREBUILT_BIN=prebuilts-master/clang/host/linux-x86/clang-r416183b/bin
 DEPMOD=depmod
 BUILDTOOLS_PREBUILT_BIN=build/build-tools/path/linux-x86
+LIBUFDT_PREBUILTS_BIN=prebuilts-master/misc/linux-x86/libufdt
 
 KCFLAGS="${KCFLAGS} -D__ANDROID_COMMON_KERNEL__"
 STOP_SHIP_TRACEPRINTK=1
