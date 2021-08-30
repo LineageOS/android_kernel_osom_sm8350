@@ -1,0 +1,10 @@
+/dts-v1/;
+/plugin/;
+
+#include "lahainap-qrd.dtsi"
+
+/ {
+	model = "OSOM Ingot";
+	compatible = "qcom,lahainap-qrd", "qcom,lahainap", "qcom,qrd";
+	qcom,board-id = <0x10005 0>;
+};
