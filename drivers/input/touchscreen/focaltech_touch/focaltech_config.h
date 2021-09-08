@@ -121,6 +121,7 @@
 
 #define _FT3518             0x35180481
 #define _FT3518U            0x3518D481
+#define _FT3519             0x35190489
 #define _FT3558             0x35580481
 #define _FT3528             0x35280481
 #define _FT5536             0x55360481
