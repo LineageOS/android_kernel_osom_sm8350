@@ -58,3 +58,9 @@
 		pinctrl-0 = <&wlc_int_active>;
 	};
 }
+
+&qupv3_se4_i2c {
+	focaltech@38 {
+		focaltech,ic-type=<0x35190489>;
+	};
+};
