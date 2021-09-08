@@ -15,3 +15,46 @@
 	regulator-max-microvolt = <1800000>;
 	qcom,min-dropout-voltage = <70000>;
 };
+
+&tlmm {
+	wlc {
+		wlc_int_active: wlc_int_active {
+			/* active state */
+			mux {
+				pins = "gpio7";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio7";
+				drive-strength = <2>; /* 2 MA */
+				bias-pull-up;
+			};
+		};
+
+		wlc_int_suspend: wlc_int_suspend {
+			/* sleep state */
+			mux {
+				pins = "gpio7";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio7";
+				drive-strength = <2>; /* 2 MA */
+				bias-pull-up;
+			};
+		};
+	};
+};
+
+&qupv3_se0_i2c {
+	status = "ok";
+	rx1619: rx1619@61 {
+		compatible = "nuvolta,wl_charger_rx1619";
+		reg = <0x61>;
+		rx,irq_gpio = <&tlmm 7 0x00>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&wlc_int_active>;
+	};
+}
