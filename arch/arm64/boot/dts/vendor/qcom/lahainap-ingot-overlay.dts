@@ -17,6 +17,50 @@
 };
 
 &tlmm {
+	ese {
+		ese_pinctrl: ese-pinctrl {
+			mux {
+				pins = "gpio76";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio76";
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
+	};
+
+	nfc {
+		nfc_pinctrl: nfc-pinctrl {
+			mux {
+				pins = "gpio62", "gpio63";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio62", "gpio63";
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
+
+		nfc_irq: nfc-irq {
+			mux {
+				pins = "gpio87";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio87";
+				drive-strength = <2>;
+				bias-pull-down;
+				input-enable;
+			};
+		};
+	};
+
 	wlc {
 		wlc_int_active: wlc_int_active {
 			/* active state */
@@ -62,5 +106,36 @@
 &qupv3_se4_i2c {
 	focaltech@38 {
 		focaltech,ic-type=<0x35190489>;
+	};
+};
+
+&qupv3_se12_spi {
+	status = "ok";
+
+	st54j: ese@1 {
+		compatible = "st,st54j_se";
+		reg = <1>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&ese_pinctrl>;
+		spi-max-frequency = <8000000>;
+		esereset-gpio = <&tlmm 76 0x00>;
+	};
+};
+
+&qupv3_se15_i2c {
+	/delete-node/ nq@28;
+
+	st21nfc: st21nfc@08 {
+		compatible = "st,st21nfc";
+		reg = <0x08>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&nfc_pinctrl>, <&nfc_irq>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <87  0>;
+		reset-gpios = <&tlmm 62 0x00>;
+		irq-gpios = <&tlmm 87 0x00>;
+		clkreq-gpios = <&tlmm 63 0x00>;
+		st,clk_pinctrl;
+		status = "ok";
 	};
 };
