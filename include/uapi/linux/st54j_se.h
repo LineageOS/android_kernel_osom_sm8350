@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /* include/uapi/linux/st54j_se.h
  * Copyright (C) 2018 ST Microelectronics S.A.
  * Copyright 2019 Google Inc.
