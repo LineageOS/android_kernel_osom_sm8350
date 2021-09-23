@@ -26,7 +26,7 @@
 
 #include <linux/ioctl.h>
 #include <linux/miscdevice.h>
-#include <linux/spi/spi-geni-qcom.h>
+#include <linux/spi/spi-msm-geni.h>
 #include <uapi/linux/st54j_se.h>
 
 #ifdef CONFIG_COMPAT
