@@ -2,6 +2,7 @@
 /plugin/;
 
 #include "lahainap-qrd.dtsi"
+#include "camera/lahaina-camera-sensor-ingot.dtsi"
 
 / {
 	model = "OSOM Ingot";
