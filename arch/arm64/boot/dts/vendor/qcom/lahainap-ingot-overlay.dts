@@ -3,6 +3,7 @@
 
 #include "lahainap-qrd.dtsi"
 #include "camera/lahaina-camera-sensor-ingot.dtsi"
+#include "display/display/dsi-panel-vtdr6130-120hz-fhd-dsc-cmd.dtsi"
 
 / {
 	model = "OSOM Ingot";
@@ -138,5 +139,47 @@
 		clkreq-gpios = <&tlmm 63 0x00>;
 		st,clk_pinctrl;
 		status = "ok";
+	};
+};
+
+&pm8350b_amoled_ecm {
+	display-panels = <&dsi_vtdr6130_120hz_fhd_dsc_cmd>;
+};
+
+&dsi_vtdr6130_120hz_fhd_dsc_cmd {
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
+
+	qcom,dsi-panel-gpio-address = <0x0F100000 0x1000>;
+	qcom,dsi-panel-gpio-pins = <24 82>;
+	qcom,dsi-panel-gpio-names = "reset-gpio", "platform-te-gpio";
+
+    /*  dyn-clk unused for now
+	qcom,dsi-dyn-clk-enable;
+	qcom,dsi-dyn-clk-list = <327096544 325733641 324370739>;
+    */
+    /*  ESD mode unused now
+	qcom,esd-check-enabled;
+	qcom,mdss-dsi-panel-status-check-mode = "reg_read";
+	qcom,mdss-dsi-panel-status-command = [06 01 00 01 00 00 01 0a];
+	qcom,mdss-dsi-panel-status-command-state = "dsi_lp_mode";
+	qcom,mdss-dsi-panel-status-value = <0x1c>;
+	qcom,mdss-dsi-panel-status-read-length = <1>;
+   */
+
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,mdss-dsi-bl-min-level = <1>;
+	qcom,mdss-dsi-bl-max-level = <4095>;
+	qcom,mdss-brightness-max-level = <255>;
+	qcom,platform-reset-gpio = <&tlmm 24 0>;
+
+	qcom,ulps-enabled;
+
+	qcom,mdss-dsi-display-timings {
+		timing@0 {
+			qcom,mdss-dsi-panel-phy-timings = [00 1a 06 06 16 14 07	07 07 02 04 00 16 0c];
+			qcom,display-topology = <2 2 1>;
+			qcom,default-topology-index = <0>;
+		};
 	};
 };
