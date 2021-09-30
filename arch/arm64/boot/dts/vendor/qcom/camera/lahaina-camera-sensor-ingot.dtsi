@@ -128,11 +128,11 @@
 		led-flash-src = <&led_flash_dual_rear>;
 		cam_vio-supply = <&pm8008j_l3>;
 		cam_vana-supply = <&pm8008i_l3>;
-		cam_vana1-supply = <&pm8008i_l5>;
+		cam_v_custom1-supply = <&pm8008i_l5>;
 		cam_vdig-supply = <&pm8008i_l1>;
 		cam_clk-supply = <&cam_cc_titan_top_gdsc>;
 		cam_bob-supply = <&pm8350c_bob>;
-		regulator-names = "cam_vio", "cam_vana", "cam_vana1",
+		regulator-names = "cam_vio", "cam_vana", "cam_v_custom1",
 			"cam_vdig", "cam_clk", "cam_bob";
 		rgltr-cntrl-support;
 		rgltr-min-voltage = <1700000 2700000 1700000 1000000 0 3200000>;
@@ -169,9 +169,9 @@
 		eeprom-src = <&eeprom_dual_ultrawide>;
 		led-flash-src = <&led_flash_dual_rear_aux>;
 		cam_vio-supply = <&pm8008j_l3>;
-		cam_vana-supply = <&pm8008i_l3>;
-		cam_v_custom1-supply = <&pm8008i_l5>;
-		cam_vdig-supply = <&pm8008i_l1>;
+		cam_vana-supply = <&pm8008i_l4>;
+		cam_v_custom1-supply = <&pm8008i_l6>;
+		cam_vdig-supply = <&pm8008i_l2>;
 		cam_clk-supply = <&cam_cc_titan_top_gdsc>;
 		cam_bob-supply = <&pm8350c_bob>;
 		regulator-names = "cam_vio", "cam_vana", "cam_v_custom1",
