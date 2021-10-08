@@ -48,12 +48,10 @@ int gf_parse_dts(struct gf_dev *gf_dev)
 	rc = devm_gpio_request(dev, gf_dev->irq_gpio, "goodix_irq");
 	if (rc) {
 		pr_err("failed to request irq gpio, rc = %d\n", rc);
-		goto err_irq;
+		goto err_reset;
 	}
 	gpio_direction_input(gf_dev->irq_gpio);
 
-err_irq:
-	devm_gpio_free(dev, gf_dev->reset_gpio);
 err_reset:
 	return rc;
 }
