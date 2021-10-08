@@ -241,8 +241,8 @@ static int st54j_se_probe(struct spi_device *spi)
 	spi_param->spi_cs_clk_delay = 90;
 	spi->controller_data = spi_param;
 
-	ese_dev->gpiod_se_reset = devm_gpiod_get(dev, "esereset",
-						 GPIOD_OUT_HIGH);
+	ese_dev->gpiod_se_reset = devm_gpiod_get_index(dev, "esereset", 0,
+						       GPIOD_OUT_HIGH);
 	if (IS_ERR(ese_dev->gpiod_se_reset)) {
 		dev_err(dev,
 			"%s : Unable to request esereset %d \n",
