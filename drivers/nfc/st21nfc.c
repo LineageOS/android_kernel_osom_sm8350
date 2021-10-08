@@ -852,19 +852,21 @@ static int st21nfc_probe(struct i2c_client *client,
 	if (ret)
 		pr_debug("Unable to add GPIO mapping table\n");
 
-	st21nfc_dev->gpiod_irq = devm_gpiod_get(dev, "irq", GPIOD_IN);
+	st21nfc_dev->gpiod_irq = devm_gpiod_get_index(dev, "irq", 0, GPIOD_IN);
 	if (IS_ERR(st21nfc_dev->gpiod_irq)) {
 		pr_err("%s : Unable to request irq-gpios\n", __func__);
 		return -ENODEV;
 	}
 
-	st21nfc_dev->gpiod_reset = devm_gpiod_get(dev, "reset", GPIOD_OUT_HIGH);
+	st21nfc_dev->gpiod_reset = devm_gpiod_get_index(dev, "reset", 0,
+							GPIOD_OUT_HIGH);
 	if (IS_ERR(st21nfc_dev->gpiod_reset)) {
 		pr_warn("%s : Unable to request reset-gpios\n", __func__);
 		return -ENODEV;
 	}
 
-	st21nfc_dev->gpiod_pidle = devm_gpiod_get(dev, "pidle", GPIOD_IN);
+	st21nfc_dev->gpiod_pidle = devm_gpiod_get_index(dev, "pidle", 0,
+							GPIOD_IN);
 	if (IS_ERR(st21nfc_dev->gpiod_pidle)) {
 		ret = 0;
 	} else {
@@ -908,7 +910,8 @@ static int st21nfc_probe(struct i2c_client *client,
 		}
 	}
 
-	st21nfc_dev->gpiod_clkreq = devm_gpiod_get(dev, "clkreq", GPIOD_IN);
+	st21nfc_dev->gpiod_clkreq = devm_gpiod_get_index(dev, "clkreq", 0,
+							 GPIOD_IN);
 	if (IS_ERR(st21nfc_dev->gpiod_clkreq)) {
 		ret = 0;
 	} else {
