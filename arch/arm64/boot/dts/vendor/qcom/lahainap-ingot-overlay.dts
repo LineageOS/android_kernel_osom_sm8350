@@ -125,7 +125,9 @@
 };
 
 &qupv3_se15_i2c {
-	/delete-node/ nq@28;
+	nq@28 {
+		status = "disabled";
+	};
 
 	st21nfc: st21nfc@08 {
 		compatible = "st,st21nfc";
