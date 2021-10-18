@@ -109,6 +109,7 @@
 	focaltech@38 {
 		focaltech,ic-type=<0x35190489>;
 		panel = <&dsi_vtdr6130_120hz_fhd_dsc_cmd>;
+		vcc_i2c-supply = <&L8C>;
 	};
 };
 
