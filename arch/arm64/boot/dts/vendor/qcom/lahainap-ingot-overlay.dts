@@ -18,6 +18,20 @@
 	qcom,min-dropout-voltage = <70000>;
 };
 
+&soc {
+	fingerprint_goodix {
+		compatible = "goodix,fingerprint";
+		interrupt-parent = <&tlmm>;
+		fp-gpio-reset = <&tlmm 39 0x0>;
+		fp-gpio-irq = <&tlmm 38 0x0>;
+		status = "ok";
+	};
+
+	qcom,qbt_handler {
+			status = "disabled";
+	};
+};
+
 &tlmm {
 	ese {
 		ese_pinctrl: ese-pinctrl {
