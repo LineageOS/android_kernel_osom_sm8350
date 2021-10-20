@@ -1,8 +1,6 @@
 #include <dt-bindings/clock/qcom,camcc-lahaina.h>
 
 &soc {
-	/delete-node/ qcom,camera-flash@6;
-
 	led_flash_dual_rear: qcom,camera-flash@4 {
 		cell-index = <4>;
 		compatible = "qcom,camera-flash";
@@ -28,10 +26,6 @@
 };
 
 &cam_cci0 {
-	/delete-node/ qcom,actuator1;
-	/delete-node/ qcom,eeprom3;
-	/delete-node/ qcom,cam-sensor3;
-
 	actuator_dual_wide: qcom,actuator0 {
 		cell-index = <0>;
 		compatible = "qcom,actuator";
@@ -203,12 +197,6 @@
 };
 
 &cam_cci1 {
-	/delete-node/ qcom,actuator2;
-	/delete-node/ qcom,eeprom2;
-	/delete-node/ qcom,eeprom4;
-	/delete-node/ qcom,cam-sensor2;
-	/delete-node/ qcom,cam-sensor4;
-
 	eeprom_imx471: qcom,eeprom5 {
 		cell-index = <5>;
 		compatible = "qcom,eeprom";
