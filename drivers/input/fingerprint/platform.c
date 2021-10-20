@@ -52,6 +52,16 @@ int gf_parse_dts(struct gf_dev *gf_dev)
 	}
 	gpio_direction_input(gf_dev->irq_gpio);
 
+	gf_dev->vcc = devm_regulator_get_optional(dev, "vcc");
+	if (IS_ERR_OR_NULL(gf_dev->vcc )) {
+		pr_err("Can't retrieve VCC reg\n");
+		gf_dev->vcc = NULL;
+	}
+	if (gf_dev->vcc) {
+		regulator_enable(gf_dev->vcc);
+		pr_err("Reg enabled\n");
+	}
+
 err_reset:
 	return rc;
 }
