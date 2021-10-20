@@ -178,11 +178,7 @@
 
 
 &qupv3_se17_spi {
-	compatible = "qorvo,geni-spi-lowlatency", "qcom,geni-spi";
-	/* On Low speed expansion */
-	label = "LS-SPI0";
 	status = "okay";
-	cs-gpio = <&tlmm 75 GPIO_ACTIVE_LOW>;
 
 	/* DW3000 on LS-SPI0 */
 	dw3000@0 {
