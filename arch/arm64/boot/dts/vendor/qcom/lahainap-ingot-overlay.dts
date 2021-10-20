@@ -127,7 +127,7 @@
 	};
 };
 
-&qupv3_se12_spi {
+&qupv3_se14_spi {
 	status = "ok";
 
 	st54j: ese@1 {
