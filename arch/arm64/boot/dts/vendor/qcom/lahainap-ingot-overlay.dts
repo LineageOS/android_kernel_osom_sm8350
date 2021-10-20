@@ -106,6 +106,21 @@
 			};
 		};
 	};
+
+	dw3000_default_state: dw3000-default {
+		irq {
+			pins = "gpio44";
+			function = "gpio";
+			bias-disable;
+		};
+
+		reset {
+			pins = "gpio45";
+			function = "gpio";
+			drive-strength = <16>;
+			bias-disable;
+		};
+	};
 };
 
 &qupv3_se0_i2c {
@@ -158,6 +173,34 @@
 		vio_i2c-supply = <&L7J>;
 		st,clk_pinctrl;
 		status = "ok";
+	};
+};
+
+
+&qupv3_se17_spi {
+	compatible = "qorvo,geni-spi-lowlatency", "qcom,geni-spi";
+	/* On Low speed expansion */
+	label = "LS-SPI0";
+	status = "okay";
+	cs-gpio = <&tlmm 75 GPIO_ACTIVE_LOW>;
+
+	/* DW3000 on LS-SPI0 */
+	dw3000@0 {
+		compatible = "decawave,dw3000";
+		reg = <0>;
+
+		interrupts-extended = <&tlmm 44 IRQ_TYPE_LEVEL_HIGH>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&dw3000_default_state>;
+
+		spi-max-frequency = <38000000>;
+
+		uwbhal,reset-gpio = <&tlmm 45 GPIO_ACTIVE_LOW>;
+
+		decawave,eui64 = /bits/ 64 <0>;
+		decawave,panid = /bits/ 16 <0>;
+		status = "okay";
 	};
 };
 
