@@ -1,9 +1,9 @@
 /dts-v1/;
 /plugin/;
 
-#include "lahainap-qrd.dtsi"
+#include "lahaina-ingot.dtsi"
 #include "camera/lahaina-camera-sensor-ingot.dtsi"
-#include "display/display/dsi-panel-vtdr6130-120hz-fhd-dsc-cmd.dtsi"
+#include "display/dsi-panel-vtdr6130-120hz-fhd-dsc-cmd.dtsi"
 
 / {
 	model = "OSOM Ingot";
