@@ -155,6 +155,7 @@
 		reset-gpios = <&tlmm 62 0x00>;
 		irq-gpios = <&tlmm 87 0x00>;
 		clkreq-gpios = <&tlmm 63 0x00>;
+		vio_i2c-supply = <&L7J>;
 		st,clk_pinctrl;
 		status = "ok";
 	};
