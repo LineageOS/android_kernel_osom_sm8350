@@ -1,6 +1,7 @@
 /dts-v1/;
 /plugin/;
 
+#include <dt-bindings/clock/qcom,rpmh.h>
 #include "lahaina-ingot.dtsi"
 #include "camera/lahaina-camera-sensor-ingot.dtsi"
 #include "display/dsi-panel-vtdr6130-120hz-fhd-dsc-cmd.dtsi"
