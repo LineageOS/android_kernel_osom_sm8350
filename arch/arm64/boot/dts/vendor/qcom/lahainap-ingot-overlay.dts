@@ -25,6 +25,7 @@
 		interrupt-parent = <&tlmm>;
 		fp-gpio-reset = <&tlmm 39 0x0>;
 		fp-gpio-irq = <&tlmm 38 0x0>;
+		vcc-supply = <&L9C>;
 		status = "ok";
 	};
 
