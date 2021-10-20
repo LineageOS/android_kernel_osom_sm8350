@@ -37,6 +37,7 @@
 #include <linux/of_gpio.h>
 #include <linux/workqueue.h>
 #include <linux/acpi.h>
+#include <linux/regulator/consumer.h>
 #include <linux/gpio/consumer.h>
 #include <net/nfc/nci.h>
 #include <linux/clk.h>
@@ -143,6 +144,7 @@ struct st21nfc_device {
 	struct gpio_desc *gpiod_pidle;
 	/* irq_gpio polarity to be used */
 	unsigned int polarity_mode;
+	struct regulator *vio_i2c;
 };
 
 /*
@@ -862,6 +864,13 @@ static int st21nfc_probe(struct i2c_client *client,
 							GPIOD_OUT_HIGH);
 	if (IS_ERR(st21nfc_dev->gpiod_reset)) {
 		pr_warn("%s : Unable to request reset-gpios\n", __func__);
+		return -ENODEV;
+	}
+
+	st21nfc_dev->vio_i2c = regulator_get(dev, "vio_i2c");
+	ret = regulator_enable(st21nfc_dev->vio_i2c);
+	if (ret) {
+		pr_err("enable vio regulator failed,ret=%d", ret);
 		return -ENODEV;
 	}
 
