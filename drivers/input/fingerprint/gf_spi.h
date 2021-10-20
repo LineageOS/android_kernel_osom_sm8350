@@ -137,6 +137,7 @@ struct gf_dev {
 	struct notifier_block notifier;
 	char device_available;
 	char fb_black;
+	struct regulator *vcc;
 };
 
 int gf_parse_dts(struct gf_dev* gf_dev);
