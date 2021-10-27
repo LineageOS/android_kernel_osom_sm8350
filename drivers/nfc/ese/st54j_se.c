@@ -111,6 +111,7 @@ static ssize_t st54j_se_write(struct file *filp, const char __user *ubuf,
 	int ret = -EFAULT;
 	size_t bytes = len;
 	char *tx_buf = NULL;
+	char *rx_buf = NULL;
 
 	if (len > INT_MAX)
 		return -EINVAL;
@@ -126,14 +127,22 @@ static ssize_t st54j_se_write(struct file *filp, const char __user *ubuf,
 			ret = -ENOMEM;
 			goto err;
 		}
+		rx_buf = kmalloc(block*sizeof(char), GFP_KERNEL);
 		if (copy_from_user(tx_buf, ubuf, block)) {
 			dev_dbg(&ese_dev->spi->dev,
 				"failed to copy from user\n");
 			goto err;
 		}
 
-		ret = spi_write(ese_dev->spi, tx_buf, block);
+		struct spi_transfer	t = {
+			.tx_buf		= tx_buf,
+			.rx_buf		= rx_buf,
+			.len		= block,
+			.speed_hz       = 8000000,
+		};
 
+		ret = spi_sync_transfer(ese_dev->spi, &t, 1);
+		kfree(rx_buf);
 		if (ret < 0) {
 			dev_dbg(&ese_dev->spi->dev, "failed to write to SPI\n");
 			goto err;
@@ -154,6 +163,7 @@ static ssize_t st54j_se_read(struct file *filp, char __user *ubuf, size_t len,
 	ssize_t ret = -EFAULT;
 	size_t bytes = len;
 	char *rx_buf = NULL;
+	char *tx_buf = NULL;
 
 	if (len > INT_MAX)
 		return -EINVAL;
@@ -169,14 +179,22 @@ static ssize_t st54j_se_read(struct file *filp, char __user *ubuf, size_t len,
 			ret = -ENOMEM;
 			goto err;
 		}
-
+		tx_buf = kmalloc(block*sizeof(char), GFP_KERNEL);
 		memset(rx_buf, 0, ST54_MAX_BUF);
-		ret = spi_read(ese_dev->spi, rx_buf, block);
+		struct spi_transfer	t = {
+			.rx_buf		= rx_buf,
+			.tx_buf		= tx_buf,
+			.len		= block,
+			.speed_hz       = 8000000,
+		};
+
+		ret = spi_sync_transfer(ese_dev->spi, &t, 1);
 		if (ret < 0) {
 			dev_err(&ese_dev->spi->dev,
 				"failed to read from SPI\n");
 			goto err;
 		}
+		kfree(tx_buf);
 		if (copy_to_user(ubuf, rx_buf, block)) {
 			dev_err(&ese_dev->spi->dev,
 				"failed to copy from user\n");
@@ -238,7 +256,6 @@ static int st54j_se_probe(struct spi_device *spi)
 	ese_dev->device.fops = &st54j_se_dev_fops;
 
 	spi->bits_per_word = 8;
-	spi_param->spi_cs_clk_delay = 90;
 	spi->controller_data = spi_param;
 
 	ese_dev->gpiod_se_reset = devm_gpiod_get_index(dev, "esereset", 0,
