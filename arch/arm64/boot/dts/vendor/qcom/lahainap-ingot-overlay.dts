@@ -147,9 +147,9 @@
 &qupv3_se14_spi {
 	status = "ok";
 
-	st54j: ese@1 {
+	st54j: ese@0 {
 		compatible = "st,st54j_se";
-		reg = <1>;
+		reg = <0>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&ese_pinctrl>;
 		spi-max-frequency = <8000000>;
