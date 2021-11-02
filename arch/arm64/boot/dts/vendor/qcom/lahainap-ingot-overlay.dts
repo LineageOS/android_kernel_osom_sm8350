@@ -178,9 +178,11 @@
 	};
 };
 
-
 &qupv3_se17_spi {
 	status = "okay";
+	qcom,disable-autosuspend;
+	qcom,disable-dma;
+	qcom,low-latency;
 
 	/* DW3000 on LS-SPI0 */
 	dw3000@0 {
