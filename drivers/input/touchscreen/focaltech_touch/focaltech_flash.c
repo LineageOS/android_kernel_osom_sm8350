@@ -45,13 +45,15 @@
 /*****************************************************************************
 * Global variable or extern global variabls/functions
 *****************************************************************************/
-u8 fw_file[1] = {
-0,
+//modify by huanghongkun begin
+u8 fw_file[] = {
+#include FTS_UPGRADE_FW_FILE
 };
 
 struct upgrade_module module_list[] = {
 	{FTS_MODULE_ID, FTS_MODULE_NAME, fw_file, sizeof(fw_file)},
 };
+//modify by huanghongkun end
 
 struct upgrade_func *upgrade_func_list[] = {
 	&upgrade_func_ft5452,

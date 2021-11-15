@@ -228,8 +228,9 @@
 /*
  * Numbers of modules support
  */
-#define FTS_GET_MODULE_NUM                      0
-
+//modify by huanghongkun begin
+#define FTS_GET_MODULE_NUM                      1
+//modify by huanghongkun end
 /*
  * module_id: mean vendor_id generally, also maybe gpio or lcm_id...
  * If means vendor_id, the FTS_MODULE_ID = PANEL_ID << 8 + VENDOR_ID
@@ -258,8 +259,9 @@
  * define your own fw_file, the sample one to be replaced is invalid
  * NOTE: if FTS_GET_MODULE_NUM > 1, it's the fw corresponding with FTS_VENDOR_ID
  */
-#define FTS_UPGRADE_FW_FILE                    "include/firmware/fw_sample.i"
-
+ //modify by huanghongkun begin
+#define FTS_UPGRADE_FW_FILE                    "include/firmware/FT3519_app.i"
+ //modify by huanghongkun end
 /*
  * if FTS_GET_MODULE_NUM >= 2, fw corrsponding with FTS_VENDOR_ID2
  * define your own fw_file, the sample one is invalid
