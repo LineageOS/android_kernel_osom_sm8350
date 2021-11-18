@@ -1327,7 +1327,7 @@ static int wireless_fw_check_for_update(struct battery_chg_dev *bcdev,
 	req_msg.fw_version = version;
 	req_msg.fw_size = size;
 	req_msg.fw_crc = bcdev->wls_fw_crc;
-
+	pr_debug("wireless_fw_update_show send BC_WLS_FW_CHECK_UPDATE ===\n");
 	return battery_chg_write(bcdev, &req_msg, sizeof(req_msg));
 }
 
@@ -1503,6 +1503,8 @@ static ssize_t wireless_fw_update_store(struct class *c,
 	bool val;
 	int rc;
 
+	rc = wireless_fw_check_for_update(bcdev, 1, 1);
+	pr_err("wireless_fw_update_store rc====%d\n", rc);
 	if (kstrtobool(buf, &val) || !val)
 		return -EINVAL;
 
@@ -1512,7 +1514,23 @@ static ssize_t wireless_fw_update_store(struct class *c,
 
 	return count;
 }
-static CLASS_ATTR_WO(wireless_fw_update);
+
+static ssize_t wireless_fw_update_show(struct class *c,
+					struct class_attribute *attr, char *buf)
+{
+	struct battery_chg_dev *bcdev = container_of(c, struct battery_chg_dev,
+						battery_class);
+	int rc;
+	rc = wireless_fw_check_for_update(bcdev, 1, 1);
+	pr_err("wireless_fw_update_show rc====%d\n", rc);
+	if (rc < 0)
+		return rc;
+
+	return scnprintf(buf, PAGE_SIZE, "%d\n",(int)rc);
+
+}
+
+static CLASS_ATTR_RW(wireless_fw_update);
 
 static ssize_t usb_typec_compliant_show(struct class *c,
 				struct class_attribute *attr, char *buf)
