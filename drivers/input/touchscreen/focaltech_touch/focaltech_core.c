@@ -1416,6 +1416,8 @@ static int fts_parse_dt(struct device *dev, struct fts_ts_platform_data *pdata)
     if (ret < 0)
         FTS_ERROR("Unable to get display-coords");
 
+    pdata->do_upgrade = of_property_read_bool(np, "focaltech,upgrade");
+
     /* key */
     pdata->have_key = of_property_read_bool(np, "focaltech,have-key");
     if (pdata->have_key) {

@@ -1872,10 +1872,16 @@ static void fts_fwupg_work(struct work_struct *work)
     return ;
 #endif
 
+
     FTS_INFO("fw upgrade work function");
     if (!upg || !upg->ts_data) {
         FTS_ERROR("upg/ts_data is null");
         return ;
+    }
+
+    if(!upg->ts_data->pdata->do_upgrade) {
+        FTS_INFO("Firmware update disabled for this device");
+        return;
     }
 
     upg->ts_data->fw_loading = 1;
