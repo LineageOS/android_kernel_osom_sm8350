@@ -27,7 +27,8 @@ dtbo-$(CONFIG_ARCH_LAHAINA) += lahaina-rumi-overlay.dtbo \
 	lahainap-cdp-overlay.dtbo \
 	lahainap-atp-overlay.dtbo \
 	lahainap-qrd-overlay.dtbo \
-	lahainap-ingot-overlay.dtbo \
+	lahainap-ingot-evt1-overlay.dtbo \
+	lahainap-ingot-evt2-overlay.dtbo \
 	lahaina-cdp-v2.2-overlay.dtbo \
 	lahaina-mtp-v2-overlay.dtbo \
 	lahaina-mtp-v2.1-overlay.dtbo \
@@ -50,7 +51,8 @@ lahainap-mtp-overlay.dtbo-base := lahainap.dtb lahainap-v2.dtb lahainap-v2.1.dtb
 lahainap-cdp-overlay.dtbo-base := lahainap.dtb lahainap-v2.dtb lahainap-v2.1.dtb
 lahainap-atp-overlay.dtbo-base := lahainap.dtb lahainap-v2.dtb lahainap-v2.1.dtb
 lahainap-qrd-overlay.dtbo-base := lahainap.dtb lahainap-v2.dtb lahainap-v2.1.dtb
-lahainap-ingot-overlay.dtbo-base := lahainap.dtb lahainap-v2.dtb lahainap-v2.1.dtb
+lahainap-ingot-evt1-overlay.dtbo-base := lahainap.dtb lahainap-v2.dtb lahainap-v2.1.dtb
+lahainap-ingot-evt2-overlay.dtbo-base := lahainap.dtb lahainap-v2.dtb lahainap-v2.1.dtb
 lahaina-cdp-v2.2-overlay.dtbo-base := lahaina.dtb lahaina-v2.dtb \
 					lahaina-v2.1.dtb
 lahaina-mtp-v2-overlay.dtbo-base := lahaina.dtb lahaina-v2.dtb \

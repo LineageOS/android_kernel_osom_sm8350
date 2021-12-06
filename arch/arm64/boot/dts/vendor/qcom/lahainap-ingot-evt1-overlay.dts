@@ -7,7 +7,7 @@
 #include "display/dsi-panel-vtdr6130-120hz-fhd-dsc-cmd.dtsi"
 
 / {
-	model = "OSOM Ingot";
+	model = "OSOM Ingot EVT1";
 	compatible = "qcom,lahainap-qrd", "qcom,lahainap", "qcom,qrd";
 	qcom,board-id = <0x10005 0>;
 };
