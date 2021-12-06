@@ -1,0 +1,245 @@
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/clock/qcom,rpmh.h>
+#include "lahaina-ingot.dtsi"
+#include "camera/lahaina-camera-sensor-ingot.dtsi"
+#include "display/dsi-panel-vtdr6130-120hz-fhd-dsc-cmd.dtsi"
+
+/ {
+	model = "OSOM Ingot EVT2";
+	compatible = "qcom,lahainap-qrd", "qcom,lahainap", "qcom,qrd";
+	qcom,board-id = <0x10105 0>;
+};
+
+
+&L7J {
+	regulator-min-microvolt = <1728000>;
+	regulator-max-microvolt = <1800000>;
+	qcom,min-dropout-voltage = <70000>;
+};
+
+&soc {
+	fingerprint_goodix {
+		compatible = "goodix,fingerprint";
+		interrupt-parent = <&tlmm>;
+		fp-gpio-reset = <&tlmm 39 0x0>;
+		fp-gpio-irq = <&tlmm 38 0x0>;
+		vcc-supply = <&L9C>;
+		status = "ok";
+	};
+
+	qcom,qbt_handler {
+			status = "disabled";
+	};
+};
+
+&tlmm {
+	ese {
+		ese_pinctrl: ese-pinctrl {
+			mux {
+				pins = "gpio76";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio76";
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
+	};
+
+	nfc {
+		nfc_pinctrl: nfc-pinctrl {
+			mux {
+				pins = "gpio62", "gpio63";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio62", "gpio63";
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
+
+		nfc_irq: nfc-irq {
+			mux {
+				pins = "gpio87";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio87";
+				drive-strength = <2>;
+				bias-pull-down;
+				input-enable;
+			};
+		};
+	};
+
+	wlc {
+		wlc_int_active: wlc_int_active {
+			/* active state */
+			mux {
+				pins = "gpio7";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio7";
+				drive-strength = <2>; /* 2 MA */
+				bias-pull-up;
+			};
+		};
+
+		wlc_int_suspend: wlc_int_suspend {
+			/* sleep state */
+			mux {
+				pins = "gpio7";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio7";
+				drive-strength = <2>; /* 2 MA */
+				bias-pull-up;
+			};
+		};
+	};
+
+	dw3000_default_state: dw3000-default {
+		irq {
+			pins = "gpio44";
+			function = "gpio";
+			bias-disable;
+		};
+
+		reset {
+			pins = "gpio45";
+			function = "gpio";
+			drive-strength = <16>;
+			bias-disable;
+		};
+	};
+};
+
+&qupv3_se0_i2c {
+	status = "ok";
+	rx1619: rx1619@61 {
+		compatible = "nuvolta,wl_charger_rx1619";
+		reg = <0x61>;
+		rx,irq_gpio = <&tlmm 7 0x00>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&wlc_int_active>;
+	};
+};
+
+&qupv3_se14_spi {
+	status = "ok";
+
+	st54j: ese@0 {
+		compatible = "st,st54j_se";
+		reg = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&ese_pinctrl>;
+		spi-max-frequency = <50000000>;
+		esereset-gpio = <&tlmm 76 0x00>;
+	};
+};
+
+&qupv3_se15_i2c {
+	nq@28 {
+		status = "disabled";
+	};
+
+	st21nfc: st21nfc@08 {
+		compatible = "st,st21nfc";
+		reg = <0x08>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&nfc_pinctrl>, <&nfc_irq>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <87  0>;
+		reset-gpios = <&tlmm 62 0x00>;
+		irq-gpios = <&tlmm 87 0x00>;
+		clkreq-gpios = <&tlmm 63 0x00>;
+		vio_i2c-supply = <&L7J>;
+		st,clk_pinctrl;
+		status = "ok";
+	};
+};
+
+&qupv3_se17_spi {
+	status = "okay";
+	qcom,disable-autosuspend;
+	qcom,disable-dma;
+	qcom,low-latency;
+
+	/* DW3000 on LS-SPI0 */
+	dw3000@0 {
+		compatible = "decawave,dw3000";
+		reg = <0>;
+
+		interrupts-extended = <&tlmm 44 IRQ_TYPE_LEVEL_HIGH>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&dw3000_default_state>;
+
+		spi-max-frequency = <38000000>;
+
+		uwbhal,reset-gpio = <&tlmm 45 GPIO_ACTIVE_LOW>;
+		power_reg_1p8-supply = <&L4J>;
+		power_reg_2p5-supply = <&L6J>;
+		decawave,eui64 = /bits/ 64 <0>;
+		decawave,panid = /bits/ 16 <0>;
+		clocks = <&clock_rpmh RPMH_RF_CLK4>;
+		clock-names = "rf_clk";
+		status = "okay";
+	};
+};
+
+&pm8350b_amoled_ecm {
+	display-panels = <&dsi_vtdr6130_120hz_fhd_dsc_cmd>;
+};
+
+&dsi_vtdr6130_120hz_fhd_dsc_cmd {
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
+
+	qcom,dsi-panel-gpio-address = <0x0F100000 0x1000>;
+	qcom,dsi-panel-gpio-pins = <24 82>;
+	qcom,dsi-panel-gpio-names = "reset-gpio", "platform-te-gpio";
+
+    /*  dyn-clk unused for now
+	qcom,dsi-dyn-clk-enable;
+	qcom,dsi-dyn-clk-list = <327096544 325733641 324370739>;
+    */
+    /*  ESD mode unused now
+	qcom,esd-check-enabled;
+	qcom,mdss-dsi-panel-status-check-mode = "reg_read";
+	qcom,mdss-dsi-panel-status-command = [06 01 00 01 00 00 01 0a];
+	qcom,mdss-dsi-panel-status-command-state = "dsi_lp_mode";
+	qcom,mdss-dsi-panel-status-value = <0x1c>;
+	qcom,mdss-dsi-panel-status-read-length = <1>;
+   */
+
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,mdss-dsi-bl-min-level = <1>;
+	qcom,mdss-dsi-bl-max-level = <4095>;
+	qcom,mdss-brightness-max-level = <4095>;
+	qcom,mdss-dsi-bl-custom-mapping;
+	qcom,mdss-dsi-bl-inverted-dbv;
+	qcom,platform-reset-gpio = <&tlmm 24 0>;
+
+	qcom,ulps-enabled;
+
+	qcom,mdss-dsi-display-timings {
+		timing@0 {
+			qcom,mdss-dsi-panel-phy-timings = [00 22 08 09 19 23 09
+				09 09 02 04 00 1c 0e];
+			qcom,display-topology = <1 0 1>;
+			qcom,default-topology-index = <0>;
+		};
+	};
+};
