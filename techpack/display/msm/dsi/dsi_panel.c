@@ -543,6 +543,11 @@ static int dsi_panel_update_backlight(struct dsi_panel *panel,
 	int rc = 0;
 	unsigned long mode_flags = 0;
 	struct mipi_dsi_device *dsi = NULL;
+	int i = 0;
+	float bl_ratio = 0;
+	u32 org_mapping[9] = {0, 31, 63, 95, 127, 159, 191, 223, 255};
+	u32 new_mapping[9] = {0, 89, 127, 156, 180, 201, 220, 238, 255};
+	u32 mapping_range = 0;
 
 	if (!panel || (bl_lvl > 0xffff)) {
 		DSI_ERR("invalid params\n");
@@ -553,6 +558,31 @@ static int dsi_panel_update_backlight(struct dsi_panel *panel,
 	if (unlikely(panel->bl_config.lp_mode)) {
 		mode_flags = dsi->mode_flags;
 		dsi->mode_flags |= MIPI_DSI_MODE_LPM;
+	}
+
+	if (bl_lvl > panel->bl_config.bl_max_level)
+		bl_lvl = panel->bl_config.bl_max_level;
+
+	if (panel->bl_config.bl_custom_mapping) {
+		bl_ratio = panel->bl_config.bl_max_level/org_mapping[8];
+		for (i = 0; i < 9; i++) {
+			org_mapping[i] = org_mapping[i] * bl_ratio;
+			new_mapping[i] = new_mapping[i] * bl_ratio;
+		}
+		org_mapping[8] = panel->bl_config.bl_max_level;
+		for (i = 1; i < 9; i++) {
+			if (bl_lvl <= org_mapping[i]) {
+				bl_ratio = (float)(bl_lvl - org_mapping[i-1]) /
+					(float)(org_mapping[i] - org_mapping[i-1]);
+				bl_lvl = bl_ratio * (new_mapping[i] - new_mapping[i-1]) +
+					new_mapping[i-1];
+				break;
+			}
+		}
+	} else {
+		bl_ratio = (float)bl_lvl / (float)panel->bl_config.bl_max_level;
+		mapping_range = panel->bl_config.bl_max_level - panel->bl_config.bl_min_level;
+		bl_lvl = bl_ratio*mapping_range + panel->bl_config.bl_min_level;
 	}
 
 	if (panel->bl_config.bl_inverted_dbv)
@@ -2447,6 +2477,9 @@ static int dsi_panel_parse_bl_config(struct dsi_panel *panel)
 
 	panel->bl_config.bl_inverted_dbv = utils->read_bool(utils->data,
 		"qcom,mdss-dsi-bl-inverted-dbv");
+
+	panel->bl_config.bl_custom_mapping = utils->read_bool(utils->data,
+		"qcom,mdss-dsi-bl-custom-mapping");
 
 	state = utils->get_property(utils->data, "qcom,bl-dsc-cmd-state", NULL);
 	if (!state || !strcmp(state, "dsi_hs_mode"))
