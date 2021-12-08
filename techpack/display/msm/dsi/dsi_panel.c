@@ -545,8 +545,9 @@ static int dsi_panel_update_backlight(struct dsi_panel *panel,
 	struct mipi_dsi_device *dsi = NULL;
 	int i = 0;
 	float bl_ratio = 0;
-	u32 org_mapping[9] = {0, 31, 63, 95, 127, 159, 191, 223, 255};
-	u32 new_mapping[9] = {0, 89, 127, 156, 180, 201, 220, 238, 255};
+	u32 org_mapping[] = {0, 31, 63, 95, 127, 159, 191, 223, 255};
+	u32 new_mapping[] = {63, 200, 210, 218, 225, 232, 240, 248, 255};
+	u32 mapping_size = ARRAY_SIZE(new_mapping);
 	u32 mapping_range = 0;
 
 	if (!panel || (bl_lvl > 0xffff)) {
@@ -564,13 +565,13 @@ static int dsi_panel_update_backlight(struct dsi_panel *panel,
 		bl_lvl = panel->bl_config.bl_max_level;
 
 	if (panel->bl_config.bl_custom_mapping) {
-		bl_ratio = panel->bl_config.bl_max_level/org_mapping[8];
-		for (i = 0; i < 9; i++) {
+		bl_ratio = panel->bl_config.bl_max_level/org_mapping[mapping_size - 1];
+		for (i = 0; i < mapping_size; i++) {
 			org_mapping[i] = org_mapping[i] * bl_ratio;
 			new_mapping[i] = new_mapping[i] * bl_ratio;
 		}
-		org_mapping[8] = panel->bl_config.bl_max_level;
-		for (i = 1; i < 9; i++) {
+		org_mapping[mapping_size - 1] = panel->bl_config.bl_max_level;
+		for (i = 1; i < mapping_size; i++) {
 			if (bl_lvl <= org_mapping[i]) {
 				bl_ratio = (float)(bl_lvl - org_mapping[i-1]) /
 					(float)(org_mapping[i] - org_mapping[i-1]);
