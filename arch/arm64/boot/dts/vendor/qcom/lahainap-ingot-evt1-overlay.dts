@@ -12,6 +12,9 @@
 	qcom,board-id = <0x10005 0>;
 };
 
+&battery_charger {
+	qcom,disable-liquid-det;
+};
 
 &L7J {
 	regulator-min-microvolt = <1728000>;
