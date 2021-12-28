@@ -1173,6 +1173,8 @@ static int fts_power_source_ctrl(struct fts_ts_data *ts_data, int enable)
                     FTS_ERROR("enable vcc_i2c regulator failed,ret=%d", ret);
                 }
             }
+            gpio_direction_output(ts_data->pdata->reset_gpio, 1);
+            msleep(1);
             ts_data->power_disabled = false;
         }
     } else {
@@ -1189,6 +1191,47 @@ static int fts_power_source_ctrl(struct fts_ts_data *ts_data, int enable)
                 if (ret) {
                     FTS_ERROR("disable vcc_i2c regulator failed,ret=%d", ret);
                 }
+            }
+            ts_data->power_disabled = true;
+        }
+    }
+
+    FTS_FUNC_EXIT();
+    return ret;
+}
+
+static int fts_power_source_ctrl_for_suspend(struct fts_ts_data *ts_data, int enable)
+{
+    int ret = 0;
+
+    if (IS_ERR_OR_NULL(ts_data->vdd)) {
+        FTS_ERROR("vdd is invalid");
+        return -EINVAL;
+    }
+
+    FTS_FUNC_ENTER();
+    if (enable) {
+        if (ts_data->power_disabled) {
+            FTS_DEBUG("regulator enable !");
+            gpio_direction_output(ts_data->pdata->reset_gpio, 0);
+            msleep(1);
+            ret = regulator_enable(ts_data->vdd);
+            if (ret) {
+                FTS_ERROR("enable vdd regulator failed,ret=%d", ret);
+            }
+
+            gpio_direction_output(ts_data->pdata->reset_gpio, 1);
+            msleep(1);
+            ts_data->power_disabled = false;
+        }
+    } else {
+        if (!ts_data->power_disabled) {
+            FTS_DEBUG("regulator disable !");
+            gpio_direction_output(ts_data->pdata->reset_gpio, 0);
+            msleep(1);
+            ret = regulator_disable(ts_data->vdd);
+            if (ret) {
+                FTS_ERROR("disable vdd regulator failed,ret=%d", ret);
             }
             ts_data->power_disabled = true;
         }
@@ -1289,7 +1332,7 @@ static int fts_power_source_suspend(struct fts_ts_data *ts_data)
     fts_pinctrl_select_suspend(ts_data);
 #endif
 
-    ret = fts_power_source_ctrl(ts_data, DISABLE);
+    ret = fts_power_source_ctrl_for_suspend(ts_data, DISABLE);
     if (ret < 0) {
         FTS_ERROR("power off fail, ret=%d", ret);
     }
@@ -1305,7 +1348,7 @@ static int fts_power_source_resume(struct fts_ts_data *ts_data)
     fts_pinctrl_select_normal(ts_data);
 #endif
 
-    ret = fts_power_source_ctrl(ts_data, ENABLE);
+    ret = fts_power_source_ctrl_for_suspend(ts_data, ENABLE);
     if (ret < 0) {
         FTS_ERROR("power on fail, ret=%d", ret);
     }
@@ -1342,7 +1385,7 @@ static int fts_gpio_configure(struct fts_ts_data *data)
             goto err_irq_gpio_dir;
         }
 
-        ret = gpio_direction_output(data->pdata->reset_gpio, 1);
+        ret = gpio_direction_output(data->pdata->reset_gpio, 0);
         if (ret) {
             FTS_ERROR("[GPIO]set_direction for reset gpio failed");
             goto err_reset_gpio_dir;
@@ -1664,6 +1707,28 @@ static int fb_notifier_callback(struct notifier_block *self,
 }
 //modify by huanghongkun end
 
+static void fts_panel_func(struct work_struct *work)
+{
+    int ret = 0;
+    static int try_times = 5;
+    struct fts_ts_data *ts_data = container_of(work,
+                                  struct fts_ts_data, panel_work.work);
+    ret = drm_check_dt(ts_data->dev->of_node);
+    if (ret) {
+        FTS_ERROR("fts_panel_func parse drm-panel fail");
+        if (try_times > 0) {
+            FTS_INFO("fts_panel_func try again");
+            queue_delayed_work(ts_data->ts_workqueue, &ts_data->panel_work,
+                               msecs_to_jiffies(2000));
+            try_times--;
+        }
+    } else {
+        ret = drm_panel_notifier_register(active_panel, &ts_data->fb_notif);
+        if (ret)
+            FTS_ERROR("[DRM]drm_panel_notifier_register fail: %d\n", ret);
+    }
+}
+
 #else
 static int drm_notifier_callback(struct notifier_block *self,
                                  unsigned long event, void *data)
@@ -1887,14 +1952,20 @@ static int fts_ts_probe_entry(struct fts_ts_data *ts_data)
 //modify by huanghongkun begin	
 #elif defined(CONFIG_DRM) 
 #if defined(CONFIG_DRM_PANEL)
-	ts_data->fb_notif.notifier_call = fb_notifier_callback;
+    ts_data->fb_notif.notifier_call = fb_notifier_callback;
     if (active_panel) {
         ret = drm_panel_notifier_register(active_panel, &ts_data->fb_notif);
         if (ret)
             FTS_ERROR("[DRM]drm_panel_notifier_register fail: %d\n", ret);
+    } else {
+        if (ts_data->ts_workqueue) {
+            INIT_DELAYED_WORK(&ts_data->panel_work, fts_panel_func);
+            queue_delayed_work(ts_data->ts_workqueue, &ts_data->panel_work,
+                               msecs_to_jiffies(5000));
+        }
     }
 #else
-	ts_data->fb_notif.notifier_call = drm_notifier_callback;
+    ts_data->fb_notif.notifier_call = drm_notifier_callback;
     ret = msm_drm_register_client(&ts_data->fb_notif);
     if (ret) {
         FTS_ERROR("[DRM]Unable to register fb_notifier: %d\n", ret);
