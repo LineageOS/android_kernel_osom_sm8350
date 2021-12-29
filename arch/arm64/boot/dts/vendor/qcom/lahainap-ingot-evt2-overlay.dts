@@ -123,6 +123,34 @@
 			bias-disable;
 		};
 	};
+
+	cnss_bootstrap_active: cnss_bootstrap_active {
+		mux {
+			pins = "gpio201";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio201";
+			drive-strength = <16>;
+			output-high;
+			bias-pull-up;
+		};
+	};
+
+	cnss_bootstrap_sleep: cnss_bootstrap_sleep {
+		mux {
+			pins = "gpio201";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio201";
+			drive-strength = <2>;
+			output-low;
+			bias-pull-down;
+		};
+	};
 };
 
 &qupv3_se0_i2c {
@@ -246,4 +274,25 @@
 			qcom,default-topology-index = <0>;
 		};
 	};
+};
+
+&wcnss_en_sleep {
+	mux {
+		pins = "gpio196";
+		function = "gpio";
+	};
+
+	config {
+		pins = "gpio196";
+		drive-strength = <2>;
+		output-high;
+		bias-pull-up;
+	};
+};
+
+&wlan {
+	pinctrl-names = "wlan_en_active", "wlan_en_sleep", "bootstrap_active", "bootstrap_sleep";
+	pinctrl-2 = <&cnss_bootstrap_active>;
+	pinctrl-3 = <&cnss_bootstrap_sleep>;
+	qcom,enable-bootstrap-gpio = <&tlmm 201 0>;
 };
