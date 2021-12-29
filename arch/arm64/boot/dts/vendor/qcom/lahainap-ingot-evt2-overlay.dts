@@ -203,6 +203,10 @@
 	display-panels = <&dsi_vtdr6130_120hz_fhd_dsc_cmd>;
 };
 
+&pm8350c_rgb {
+	pwm-divider = <2>;
+};
+
 &dsi_vtdr6130_120hz_fhd_dsc_cmd {
 	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
 
