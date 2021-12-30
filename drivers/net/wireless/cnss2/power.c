@@ -51,6 +51,7 @@ static struct cnss_clk_cfg cnss_clk_list[] = {
 
 #define BOOTSTRAP_GPIO			"qcom,enable-bootstrap-gpio"
 #define BOOTSTRAP_ACTIVE		"bootstrap_active"
+#define BOOTSTRAP_SLEEP			"bootstrap_sleep"
 #define WLAN_EN_GPIO			"wlan-en-gpio"
 #define BT_EN_GPIO			"qcom,bt-en-gpio"
 #define XO_CLK_GPIO			"qcom,xo-clk-gpio"
@@ -749,6 +750,15 @@ int cnss_get_pinctrl(struct cnss_plat_data *plat_priv)
 				    ret);
 			goto out;
 		}
+		pinctrl_info->bootstrap_sleep =
+			pinctrl_lookup_state(pinctrl_info->pinctrl,
+					     BOOTSTRAP_SLEEP);
+		if (IS_ERR_OR_NULL(pinctrl_info->bootstrap_sleep)) {
+			ret = PTR_ERR(pinctrl_info->bootstrap_sleep);
+			cnss_pr_err("Failed to get bootstrap sleep state, err = %d\n",
+				    ret);
+			goto out;
+		}
 	}
 
 	if (of_find_property(dev->of_node, WLAN_EN_GPIO, NULL)) {
@@ -890,6 +900,16 @@ static int cnss_select_pinctrl_state(struct cnss_plat_data *plat_priv,
 				     WLAN_ENABLE_DELAY + 1000);
 		}
 		cnss_set_xo_clk_gpio_state(plat_priv, false);
+		if (!IS_ERR_OR_NULL(pinctrl_info->bootstrap_sleep)) {
+			ret = pinctrl_select_state
+				(pinctrl_info->pinctrl,
+				 pinctrl_info->bootstrap_sleep);
+			if (ret) {
+				cnss_pr_err("Failed to select bootstrap sleep state, err = %d\n",
+					    ret);
+				goto out;
+			}
+		}
 	} else {
 		if (!IS_ERR_OR_NULL(pinctrl_info->wlan_en_sleep)) {
 			ret = pinctrl_select_state(pinctrl_info->pinctrl,
