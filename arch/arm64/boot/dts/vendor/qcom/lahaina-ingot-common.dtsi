@@ -108,7 +108,7 @@
 };
 
 &lahaina_snd {
-	qcom,model = "lahaina-qrd-snd-card";
+	qcom,model = "lahaina-ingot-snd-card";
 
 	qcom,audio-routing =
 		"AMIC1", "Analog Mic1",
