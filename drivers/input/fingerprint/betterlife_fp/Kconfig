@@ -1,5 +1,5 @@
 config BETTERLIFE_FINGERPRINT
-    bool "betterlife Fingerprint"
+    tristate "betterlife Fingerprint"
 	default y
 	---help---
 	betterlife fingerprint.

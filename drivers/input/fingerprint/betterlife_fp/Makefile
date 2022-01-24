@@ -113,4 +113,5 @@ endif
 
 # -w -Wno-strict-aliasing -Wno-error=unused-function -Wno-error=unused-label -Wno-warning=unused-function -Wno-warning=unused-label
 ccflags-y += -Wno-unused-label -Wno-unused-variable
-obj-y := bf_fp_spi.o bf_fp_platform.o
+obj-$(CONFIG_BETTERLIFE_FINGERPRINT) += betterlife_fps.o
+betterlife_fps-y := bf_fp_spi.o bf_fp_platform.o
