@@ -652,7 +652,6 @@ static struct spi_board_info spi_board_blfp[] __initdata = {
 static struct spi_driver bf_spi_driver = {
     .driver = {
         .name = BF_DEV_NAME,
-        .bus	= &spi_bus_type,
         .owner = THIS_MODULE,
 #ifdef CONFIG_OF
         .of_match_table = bf_of_spi_table,
