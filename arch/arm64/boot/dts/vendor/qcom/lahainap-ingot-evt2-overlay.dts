@@ -29,6 +29,14 @@
 		status = "ok";
 	};
 
+	fingerprint-betterlife {
+		compatible = "betterlife,platform";
+		fpint-gpio = <&tlmm 38 0x0>;
+		fpreset-gpio = <&tlmm 39 0x0>;
+		vcc-supply = <&L9C>;
+		status = "ok";
+	};
+
 	qcom,qbt_handler {
 			status = "disabled";
 	};
