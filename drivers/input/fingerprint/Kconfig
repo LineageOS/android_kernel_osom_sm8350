@@ -3,3 +3,5 @@ config GOODIX_FINGERPRINT
 	default y
 	help
 	add support for goodix fingerprint driver.
+
+source "drivers/input/fingerprint/betterlife_fp/Kconfig"
