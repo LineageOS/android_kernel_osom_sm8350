@@ -138,7 +138,7 @@ struct bf_device {
 #ifdef NEED_OPT_POWER_ON1V8
     struct pinctrl_state *pins_power_1v8_high, *pins_power_1v8_low;
 #endif
-#if defined(CONFIG_FB)
+#if defined(CONFIG_FB) || defined(CONFIG_DRM)
     struct notifier_block fb_notify;
 #elif defined(CONFIG_HAS_EARLYSUSPEND)
     struct early_suspend early_suspend;
