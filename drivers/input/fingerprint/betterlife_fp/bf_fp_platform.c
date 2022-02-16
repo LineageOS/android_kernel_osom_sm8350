@@ -44,6 +44,8 @@
 #if defined(CONFIG_FB)
 #include <linux/notifier.h>
 #include <linux/fb.h>
+#elif defined(CONFIG_DRM)
+#include <drm/drm_panel.h>
 #elif defined(CONFIG_HAS_EARLYSUSPEND)
 #include <linux/earlysuspend.h>
 #endif
@@ -249,6 +251,84 @@ static int fb_notifier_callback(struct notifier_block *self,
     }
     mutex_unlock(&g_dev_lock);
     return 0;
+}
+#elif defined(CONFIG_DRM)
+static struct drm_panel *active_panel;
+
+static int drm_check_dt(struct device_node *np)
+{
+    int i = 0;
+    int count = 0;
+    struct device_node *node = NULL;
+    struct drm_panel *panel = NULL;
+
+    count = of_count_phandle_with_args(np, "panel", NULL);
+    if (count <= 0) {
+        BF_LOG("find drm_panel count(%d) fail", count);
+        return -ENODEV;
+    }
+
+    for (i = 0; i < count; i++) {
+        node = of_parse_phandle(np, "panel", i);
+        panel = of_drm_find_panel(node);
+        of_node_put(node);
+        if (!IS_ERR(panel)) {
+            BF_LOG("find drm_panel successfully");
+            active_panel = panel;
+            return 0;
+        }
+    }
+
+    BF_LOG("no find drm_panel");
+    return -ENODEV;
+}
+
+static int fb_notifier_callback(struct notifier_block *self,
+				unsigned long event, void *data)
+{
+	struct drm_panel_notifier *evdata = data;
+	int *blank = NULL;
+	BF_LOG("lxm fb_notifier_callback \n");
+
+	if (!evdata)
+	{
+		return 0;
+	}
+
+	if (!(event == DRM_PANEL_EARLY_EVENT_BLANK ||
+		event == DRM_PANEL_EVENT_BLANK)) {
+		BF_LOG("event(%lu) do not need process\n", event);
+		return 0;
+	}
+
+	blank = evdata->data;
+	BF_LOG("FB event:%lu,blank:%d", event, *blank);
+	switch (*blank) {
+	case DRM_PANEL_BLANK_UNBLANK:
+		if (event == DRM_PANEL_EARLY_EVENT_BLANK) {
+			BF_LOG("resume: early event = %lu, \n", event);
+			bf_send_netlink_msg(g_bf_dev, BF_NETLINK_CMD_SCREEN_ON);
+		} else if (event == DRM_PANEL_EVENT_BLANK) {
+			BF_LOG("resume: event = %lu, not care\n", event);
+			//bf_send_netlink_msg(g_bf_dev, BF_NETLINK_CMD_SCREEN_ON);
+		}
+		break;
+
+	case DRM_PANEL_BLANK_POWERDOWN:
+		if (event == DRM_PANEL_EARLY_EVENT_BLANK) {
+			BF_LOG("suspend: early event = %lu, \n", event);
+			bf_send_netlink_msg(g_bf_dev, BF_NETLINK_CMD_SCREEN_OFF);
+		} else if (event == DRM_PANEL_EVENT_BLANK) {
+			BF_LOG("suspend: event = %lu, not care\n", event);
+		}
+		break;
+
+	default:
+		BF_LOG("FB BLANK(%d) do not need process\n", *blank);
+		break;
+	}
+
+	return 0;
 }
 #elif defined(CONFIG_HAS_EARLYSUSPEND)
 static void early_suspend(struct bf_device *bf_dev)
@@ -609,9 +689,9 @@ static int bf_main_get_gpio_info (struct bf_device *bf_dev)
 	//lxm
 	struct device *dev = &bf_dev->pdev->dev;
 	struct device_node *node = dev->of_node;
-#ifdef BF_PINCTL
+//#ifdef BF_PINCTL
     int32_t ret = 0;
-#endif
+//#endif
 
 #ifndef MTK_ANDROID_L
 
@@ -663,6 +743,12 @@ static int bf_main_get_gpio_info (struct bf_device *bf_dev)
 		BF_LOG("Reg enabled\n");
 	}
 //
+	#if defined(CONFIG_DRM)
+	    ret = drm_check_dt(node);
+	    if (ret) {
+		    BF_LOG("parse drm-panel fail");
+	    }
+	#endif
     } else {
         BF_LOG( "device of_node is null");
         return -EINVAL;
@@ -1466,6 +1552,9 @@ int bf_remove(struct platform_device *pdev)
 
 #if defined(CONFIG_FB)
     fb_unregister_client(&bf_dev->fb_notify);
+#elif defined(CONFIG_DRM)
+    if (active_panel)
+        drm_panel_notifier_unregister(active_panel, &bf_dev->fb_notify);
 #elif defined(CONFIG_HAS_EARLYSUSPEND)
     unregister_early_suspend(&bf_dev->early_suspend);
 #endif
@@ -1538,6 +1627,7 @@ int bf_init_dts_and_irq(struct bf_device *bf_dev)
 {
     static int initialized = 0;
     int32_t status = -EINVAL;
+    int ret;
     BF_LOG( "    ++++");
     if(initialized != 1) {
         status = bf_main_get_gpio_info(bf_dev);
@@ -1574,6 +1664,16 @@ int bf_init_dts_and_irq(struct bf_device *bf_dev)
 
         enable_irq_wake(bf_dev->irq_num);
         initialized = 1;
+
+#if defined(CONFIG_DRM)
+        bf_dev->fb_notify.notifier_call = fb_notifier_callback;
+        if (active_panel) {
+            BF_LOG("lxm drm_panel_notifier_register  !!!!!!!!!!!!!!!!!!! \n");
+            ret = drm_panel_notifier_register(active_panel, &bf_dev->fb_notify);
+            if (ret)
+            BF_LOG("[DRM]drm_panel_notifier_register fail: %d\n", ret);
+		}
+#endif
     } else {
         BF_LOG( " has initilized, do nothing !");
     }
