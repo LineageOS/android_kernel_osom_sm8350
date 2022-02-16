@@ -34,6 +34,7 @@
 		fpint-gpio = <&tlmm 38 0x0>;
 		fpreset-gpio = <&tlmm 39 0x0>;
 		vcc-supply = <&L9C>;
+		panel = <&dsi_vtdr6130_120hz_fhd_dsc_cmd>;
 		status = "ok";
 	};
 
