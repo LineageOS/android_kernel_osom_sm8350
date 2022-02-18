@@ -1140,8 +1140,7 @@ static irqreturn_t bf_eint_handler (int irq, void *data)
 #ifdef KERNEL_4_9
 //lxm
     //__pm_wakeup_event(&fp_suspend_lock, msecs_to_jiffies (5000));
-	__pm_wakeup_event(fp_suspend_lock, msecs_to_jiffies (5000));
-
+	__pm_wakeup_event(fp_suspend_lock, 1500);
 #else
     wake_lock_timeout(&fp_suspend_lock, msecs_to_jiffies (5000));
 #endif
@@ -1754,9 +1753,9 @@ static int bf_probe(struct platform_device *pdev)
     wakeup_source_init(&hw_reset_lock, "fp_reset_wakelock");
     wakeup_source_init(&adjust_wake_lock, "adjust_wake_lock");
 */
-	fp_suspend_lock = wakeup_source_register(&bf_dev->pdev->dev, "fp_wakelock");
-	hw_reset_lock = wakeup_source_register(&bf_dev->pdev->dev, "fp_reset_wakelock");
-	adjust_wake_lock = wakeup_source_register(&bf_dev->pdev->dev, "adjust_wake_lock");
+	fp_suspend_lock = wakeup_source_register(&bf_dev->pdev->dev, "fp_btl_wakelock");
+	hw_reset_lock = wakeup_source_register(&bf_dev->pdev->dev, "fp_btlreset_wakelock");
+	adjust_wake_lock = wakeup_source_register(&bf_dev->pdev->dev, "btl_adjust_wake_lock");
 
 #else
     wake_lock_init(&fp_suspend_lock, WAKE_LOCK_SUSPEND, "fp_wakelock");
