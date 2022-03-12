@@ -546,7 +546,7 @@ static int dsi_panel_update_backlight(struct dsi_panel *panel,
 	int i = 0;
 	float bl_ratio = 0;
 	u32 org_mapping[] = {0, 31, 63, 95, 127, 159, 191, 223, 255};
-	u32 new_mapping[] = {63, 200, 210, 218, 225, 232, 240, 248, 255};
+	u32 new_mapping[] = {0, 61, 153, 201, 225, 237, 246, 252, 255};
 	u32 mapping_size = ARRAY_SIZE(new_mapping);
 	u32 mapping_range = 0;
 
