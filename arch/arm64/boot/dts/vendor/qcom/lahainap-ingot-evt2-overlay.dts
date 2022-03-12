@@ -268,6 +268,7 @@
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <1>;
 	qcom,mdss-dsi-bl-max-level = <3800>;
+	qcom,mdss-dsi-bl-custom-mapping;
 	qcom,mdss-dsi-bl-inverted-dbv;
 	qcom,mdss-brightness-max-level = <3800>;
 	qcom,platform-reset-gpio = <&tlmm 24 0>;
