@@ -252,25 +252,27 @@
 };
 
 &pm8350b_haptics {
-	qcom,vmax-mv = <1690>;
-	qcom,lra-period-us = <5880>;
+	qcom,vmax-mv = <1680>;
+	qcom,fifo-vmax-mv = <8700>;
+	qcom,lra-period-us = <5882>;
+	qcom,fifo-empty-threshold = <480>;
 	status = "ok";
 
 	effect_0 {
 		/* CLICK */
-		qcom,wf-vmax-mv = <8000>;
+		qcom,wf-vmax-mv = <1800>;
 		qcom,wf-pattern-period-us = <5880>;
 	};
 
 	effect_1 {
 		/* DOUBLE_CLICK */
-		qcom,wf-vmax-mv = <8000>;
+		qcom,wf-vmax-mv = <1800>;
 		qcom,wf-pattern-period-us = <5880>;
 	};
 
 	effect_2 {
 		/* TICK */
-		qcom,wf-vmax-mv = <8000>;
+		qcom,wf-vmax-mv = <1800>;
 		qcom,wf-pattern-period-us = <5880>;
 	};
 
