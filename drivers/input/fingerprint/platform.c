@@ -58,7 +58,7 @@ int gf_parse_dts(struct gf_dev *gf_dev)
 		gf_dev->vcc = NULL;
 	}
 	if (gf_dev->vcc) {
-		regulator_enable(gf_dev->vcc);
+		rc = regulator_enable(gf_dev->vcc);
 		pr_err("Reg enabled\n");
 	}
 
