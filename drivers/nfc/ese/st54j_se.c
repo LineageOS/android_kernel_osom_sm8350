@@ -112,6 +112,7 @@ static ssize_t st54j_se_write(struct file *filp, const char __user *ubuf,
 	size_t bytes = len;
 	char *tx_buf = NULL;
 	char *rx_buf = NULL;
+	struct spi_transfer t;
 
 	if (len > INT_MAX)
 		return -EINVAL;
@@ -134,12 +135,10 @@ static ssize_t st54j_se_write(struct file *filp, const char __user *ubuf,
 			goto err;
 		}
 
-		struct spi_transfer	t = {
-			.tx_buf		= tx_buf,
-			.rx_buf		= rx_buf,
-			.len		= block,
-			.speed_hz       = 8000000,
-		};
+		t.tx_buf   = tx_buf;
+		t.rx_buf   = rx_buf;
+		t.len      = block;
+		t.speed_hz = 8000000;
 
 		ret = spi_sync_transfer(ese_dev->spi, &t, 1);
 		kfree(rx_buf);
@@ -164,6 +163,7 @@ static ssize_t st54j_se_read(struct file *filp, char __user *ubuf, size_t len,
 	size_t bytes = len;
 	char *rx_buf = NULL;
 	char *tx_buf = NULL;
+	struct spi_transfer t;
 
 	if (len > INT_MAX)
 		return -EINVAL;
@@ -181,12 +181,10 @@ static ssize_t st54j_se_read(struct file *filp, char __user *ubuf, size_t len,
 		}
 		tx_buf = kmalloc(block*sizeof(char), GFP_KERNEL);
 		memset(rx_buf, 0, ST54_MAX_BUF);
-		struct spi_transfer	t = {
-			.rx_buf		= rx_buf,
-			.tx_buf		= tx_buf,
-			.len		= block,
-			.speed_hz       = 8000000,
-		};
+		t.rx_buf   = rx_buf;
+		t.tx_buf   = tx_buf;
+		t.len      = block;
+		t.speed_hz = 8000000;
 
 		ret = spi_sync_transfer(ese_dev->spi, &t, 1);
 		if (ret < 0) {
