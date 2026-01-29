@@ -678,7 +678,7 @@ out:
     return error;
 }
 
-void bf_spi_unregister()
+void bf_spi_unregister(void)
 {
     BF_LOG("%s ++", __func__);
     spi_unregister_driver(&bf_spi_driver);

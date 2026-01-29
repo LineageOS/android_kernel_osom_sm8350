@@ -739,7 +739,7 @@ static int bf_main_get_gpio_info (struct bf_device *bf_dev)
 		bf_dev->vcc = NULL;
 	}
 	if (bf_dev->vcc) {
-		regulator_enable(bf_dev->vcc);
+		(void)regulator_enable(bf_dev->vcc);
 		BF_LOG("Reg enabled\n");
 	}
 //
@@ -1900,7 +1900,7 @@ static struct platform_driver bf_plt_driver = {
 
 //module_platform_driver(bf_plt_driver);
 
-void bf_unregister()
+void bf_unregister(void)
 {
     platform_driver_unregister(&bf_plt_driver);
 
