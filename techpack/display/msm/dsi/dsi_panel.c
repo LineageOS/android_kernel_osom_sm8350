@@ -544,7 +544,7 @@ static int dsi_panel_update_backlight(struct dsi_panel *panel,
 	unsigned long mode_flags = 0;
 	struct mipi_dsi_device *dsi = NULL;
 	int i = 0;
-	float bl_ratio = 0;
+	u32 bl_ratio_q16 = 0;
 	u32 org_mapping[] = {0, 31, 63, 95, 127, 159, 191, 223, 255};
 	u32 new_mapping[] = {0, 61, 153, 201, 225, 237, 246, 252, 255};
 	u32 mapping_size = ARRAY_SIZE(new_mapping);
@@ -565,25 +565,34 @@ static int dsi_panel_update_backlight(struct dsi_panel *panel,
 		bl_lvl = panel->bl_config.bl_max_level;
 
 	if (panel->bl_config.bl_custom_mapping) {
-		bl_ratio = panel->bl_config.bl_max_level/org_mapping[mapping_size - 1];
+		u32 scale = div_u64(panel->bl_config.bl_max_level,
+			org_mapping[mapping_size - 1]);
 		for (i = 0; i < mapping_size; i++) {
-			org_mapping[i] = org_mapping[i] * bl_ratio;
-			new_mapping[i] = new_mapping[i] * bl_ratio;
+			org_mapping[i] = org_mapping[i] * scale;
+			new_mapping[i] = new_mapping[i] * scale;
 		}
 		org_mapping[mapping_size - 1] = panel->bl_config.bl_max_level;
 		for (i = 1; i < mapping_size; i++) {
 			if (bl_lvl <= org_mapping[i]) {
-				bl_ratio = (float)(bl_lvl - org_mapping[i-1]) /
-					(float)(org_mapping[i] - org_mapping[i-1]);
-				bl_lvl = bl_ratio * (new_mapping[i] - new_mapping[i-1]) +
-					new_mapping[i-1];
+				u32 denom = org_mapping[i] - org_mapping[i - 1];
+				u32 numer = bl_lvl - org_mapping[i - 1];
+				s32 delta = (s32)new_mapping[i] - (s32)new_mapping[i - 1];
+
+				/* Q16 ratio in [0, 1] */
+				bl_ratio_q16 = div_u64(((u64)numer) << 16, (u64)denom);
+
+				/* new = prev + ratio * (next-prev) */
+				bl_lvl = new_mapping[i - 1] +
+					(u32)div_u64((u64)delta * bl_ratio_q16, 1U << 16);
 				break;
 			}
 		}
 	} else {
-		bl_ratio = (float)bl_lvl / (float)panel->bl_config.bl_max_level;
 		mapping_range = panel->bl_config.bl_max_level - panel->bl_config.bl_min_level;
-		bl_lvl = bl_ratio*mapping_range + panel->bl_config.bl_min_level;
+		bl_ratio_q16 = div_u64(((u64)bl_lvl) << 16,
+				       (u64)panel->bl_config.bl_max_level);
+		bl_lvl = panel->bl_config.bl_min_level +
+			(u32)div_u64((u64)mapping_range * bl_ratio_q16, 1U << 16);
 	}
 
 	if (panel->bl_config.bl_inverted_dbv)
