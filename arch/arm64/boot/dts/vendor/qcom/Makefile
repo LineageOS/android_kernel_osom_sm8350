@@ -1,3 +1,15 @@
+ifeq ($(CONFIG_MACH_OSOM_PYRITE),y)
+ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
+dtbo-$(CONFIG_ARCH_LAHAINA) += \
+	lahainap-ingot-evt1-overlay.dtbo \
+	lahainap-ingot-evt2-overlay.dtbo
+
+lahainap-ingot-evt1-overlay.dtbo-base := lahainap.dtb lahainap-v2.dtb lahainap-v2.1.dtb
+lahainap-ingot-evt2-overlay.dtbo-base := lahainap.dtb lahainap-v2.dtb lahainap-v2.1.dtb
+else
+dtb-$(CONFIG_ARCH_LAHAINA) += lahainap-ingot.dtb
+endif
+else
 ifneq ($(CONFIG_ARCH_QTI_VM), y)
 ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
 dtbo-$(CONFIG_ARCH_LAHAINA) += lahaina-rumi-overlay.dtbo \
@@ -562,7 +574,9 @@ dtb-$(CONFIG_ARCH_DIREWOLF) += direwolf-ivi-rumi.dtb \
 	direwolf-adas-rumi.dtb \
 	direwolf-adas-adp-star.dtb
 endif
+endif
 
 always		:= $(dtb-y)
 subdir-y	:= $(dts-dirs)
 clean-files	:= *.dtb *.dtbo
+
