@@ -34,6 +34,24 @@
       "parentUuid": "2eecfde2_a76ea011",
       "revId": "91b39193a4b27cde4038d9e52eaa4db7d4156a39",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d25d3fd6_63fc0f62",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 29080
+      },
+      "writtenOn": "2026-05-26T12:11:43Z",
+      "side": 1,
+      "message": "Okay, the chain is finalized now",
+      "parentUuid": "8aba55aa_632f99e7",
+      "revId": "91b39193a4b27cde4038d9e52eaa4db7d4156a39",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
     }
   ]
 }
